@@ -51,11 +51,27 @@ namespace StudentSchedule
             Console.WriteLine("url " + url);
             if(url == "https://dot.tou.edu.kz/courses")
             {
+                loginEntry.IsEnabled = false;
+                passwordEntry.IsEnabled = false;
                 webView.Source = "https://dot.tou.edu.kz/students-schedule";
             }
             if(url == "https://dot.tou.edu.kz/students-schedule")
             {
                 Html_ScheduleAsync();
+            }
+        }
+
+        protected override void OnAppearing()
+        {
+            object status = "";
+            if (App.Current.Properties.TryGetValue("login", out status))
+            {
+                if ((string)status == "out")
+                {
+                    loginEntry.IsEnabled = true;
+                    passwordEntry.IsEnabled = true;
+                    webView.Source = "https://dot.tou.edu.kz/auth/logout";
+                }
             }
         }
     }

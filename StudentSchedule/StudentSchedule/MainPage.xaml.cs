@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -31,14 +32,20 @@ namespace StudentSchedule
         public MainPage()
         {
             InitializeComponent();
+            App.Current.Properties["login"] = "in";
+            NavigationPage.SetHasBackButton(this, true);
+            
+        }
+        protected override bool OnBackButtonPressed()
+        {
+            return true;
         }
 
         public async void LoadSchedule()
         {
-            Console.WriteLine("123");
             //Определения дня недели
             DateTime dateTime = DateTime.Now;
-            DayOfWeek = dateTime.DayOfWeek.ToString();
+            DayOfWeek = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetDayName(dateTime.DayOfWeek);
             Console.WriteLine(DayOfWeek);
             //Получение HTML разметки с WebView
             var page = await webView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
@@ -102,8 +109,38 @@ namespace StudentSchedule
                 }
             }
 
+
+            int index_day = 0;
             //Вывод расписания конкретного дня
-            ArrayList day = (ArrayList)days_of_weeks[2];
+            if(DayOfWeek == "понедельник")
+            {
+                index_day = 0;
+            }
+            if(DayOfWeek == "вторник")
+            {
+                index_day = 1;
+            }
+            if(DayOfWeek == "среда")
+            {
+                index_day = 2;
+            }
+            if (DayOfWeek == "четверг")
+            {
+                index_day = 3;
+            }
+            if (DayOfWeek == "пятница")
+            {
+                index_day = 4;
+            }
+            if (DayOfWeek == "суббота")
+            {
+                index_day = 0;
+            }
+            if (DayOfWeek == "воскресенье")
+            {
+                index_day = 0;
+            }
+            ArrayList day = (ArrayList)days_of_weeks[index_day];
             int i = 0;
             Lessons = new List<Lesson>();
             string lesson = "";
@@ -180,6 +217,17 @@ namespace StudentSchedule
             {
                 LoadSchedule();
             }
+        }
+
+        private void ToolbarItem_Clicked(object sender, EventArgs e)
+        {
+            LoadSchedule();
+        }
+
+        protected override void OnDisappearing()
+        {
+            Console.WriteLine("123");
+            App.Current.Properties["login"] = "out";
         }
     }
 }
