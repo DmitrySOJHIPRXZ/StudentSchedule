@@ -46,7 +46,6 @@ namespace StudentSchedule
             //Определения дня недели
             DateTime dateTime = DateTime.Now;
             DayOfWeek = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetDayName(dateTime.DayOfWeek);
-            Console.WriteLine(DayOfWeek);
             //Получение HTML разметки с WebView
             var page = await webView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
 
@@ -56,24 +55,24 @@ namespace StudentSchedule
             var html = new HtmlDocument();
             html.LoadHtml(page);
             var table = html.DocumentNode.SelectSingleNode("//table[1]");//Получение первой табиоцы
-            var week = html.DocumentNode.SelectSingleNode("//p[1]");//Получение типа недели
+            var week = html.DocumentNode.SelectSingleNode("//div[@class='hide-on-med-and-up']/div[2]");//Получение типа недели
             type_week = week.InnerText;
+            string[] words = type_week.ToString().Replace(" ","").Split(',');
 
 
+            string week_s = words[1].Replace("\n","");
             //Определение типа недели и запись в переменную
-            if (week.InnerText == "Сейчас Числитель")
+            if (week_s == "Числитель")
             {
-                type_week_s = "числ.";
+                type_week_s = "(числ.)";
             }
-            else if (week.InnerText == "Сейчас Знаменатель")
+            else if (week_s == "Знаменатель")
             {
-                type_week_s = "знам.";
+                type_week_s = "(знам.)";
             }
-            Console.WriteLine(type_week);
             //Получение всех строк таблицы 
             var rows = table.Descendants("tr")
                 .Select(tr => tr.Descendants("td").Select(td => td.InnerText).ToList());
-            Console.WriteLine(rows);
 
             //Сортировка строк таблицы
             foreach (var row in rows)
@@ -103,7 +102,14 @@ namespace StudentSchedule
                             days_of_weeks.Insert(4, classes);
                             break;
                         default:
-                            classes.Add(item);
+                            if(item != "")
+                            {
+                                if(item.Length > 3)
+                                {
+                                    classes.Add(item);
+                                    break;
+                                }
+                            }
                             break;
                     }
                 }
@@ -138,73 +144,53 @@ namespace StudentSchedule
             }
             if (DayOfWeek == "воскресенье")
             {
-                index_day = 0;
+                index_day = 2;
             }
             ArrayList day = (ArrayList)days_of_weeks[index_day];
             int i = 0;
             Lessons = new List<Lesson>();
-            string lesson = "";
             string data_time = "";
             string teacher = "";
             foreach (var item in day)
             {
                 if (i == 0)
                 {
-                    lesson = item.ToString();
-                    Console.WriteLine("Аудитория " + item.ToString());
+                    data_time = item.ToString();
                     i++;
                 }
                 else if (i == 1)
                 {
-                    data_time = item.ToString();
-                    Console.WriteLine("Время занятий " + item.ToString());
-                    i++;
-                }
-                else if (i == 2)
-                {
-                    string str_item = item.ToString();
-                    int len = str_item.Length;
-                    int index_item_znam = str_item.IndexOf(znam);
-                    int index_item_chisl = str_item.IndexOf(chisl);
-                    int length_chisl = index_item_znam - index_item_chisl;
-                    int length_znam = len - index_item_znam;
-                    if (index_item_chisl == -1 && index_item_znam == -1)
+                    teacher = item.ToString().Replace("\n", "");
+                    if (type_week_s == "(числ.)")
                     {
-                        Console.WriteLine("Преподователь " + item.ToString());
-                        teacher = item.ToString();
-                        i = 0;
-                    }
-                    else
-                    {
-                        if (type_week_s == "числ.")
+                        if (teacher.IndexOf(type_week_s) != -1)
                         {
-                            string sub_str = str_item.Substring(index_item_chisl, length_chisl);
-                            Console.WriteLine("Преподователь " + sub_str.ToString());
-                            teacher = sub_str.ToString();
-                            i = 0;
-                        }
-                        else if (type_week_s == "знам.")
-                        {
-                            string sub_str = str_item.Substring(index_item_znam, length_znam);
-                            Console.WriteLine("Преподователь " + sub_str.ToString());
-                            teacher = sub_str.ToString();
-                            i = 0;
+                            teacher = teacher.Substring(0, teacher.IndexOf(type_week_s));
                         }
                     }
+                    else if (type_week_s == "(знам.)")
+                    {
+                        if (teacher.IndexOf(type_week_s) != -1)
+                        {
+                            teacher = teacher.Substring(teacher.IndexOf("(числ.)"));
+                            if (teacher.Length == 14)
+                            {
+                                teacher = "";
+                            }
+                        }
+                    }
+                    i = 0;
                 }
-                if (lesson != "")
+                if (data_time != "")
                 {
                     if (teacher != "")
                     {
-                        if (data_time != "")
-                        {
-                            Lessons.Add(new Lesson { lesson = lesson, data_time = data_time, teacher = teacher });
-                            lesson = "";
-                            data_time = "";
-                            teacher = "";
-                        }
+                        Lessons.Add(new Lesson { lesson = "Занятие", data_time = data_time, teacher = teacher });
+                        data_time = "";
+                        teacher = "";
                     }
                 }
+
 
             }
             this.BindingContext = this;
@@ -213,7 +199,7 @@ namespace StudentSchedule
         private void webView_Navigated(object sender, WebNavigatedEventArgs e)
         {
             var url = e.Url;
-            if (url == "https://dot.tou.edu.kz/students-schedule")
+            if (url == "https://bikli.000webhostapp.com/site.html")
             {
                 LoadSchedule();
             }

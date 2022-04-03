@@ -2,7 +2,6 @@ using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 
-[assembly: ExportRenderer(typeof(StudentSchedule.Controls.BorderlessEntry), typeof(StudentSchedule.iOS.BorderlessEntryRenderer))]
 
 namespace StudentSchedule.iOS
 {

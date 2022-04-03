@@ -12,10 +12,7 @@
             </StackLayout>
             <StackLayout Padding="0" Margin="40,100,40,0" HorizontalOptions="FillAndExpand">
                 <Frame  BackgroundColor="#00ffffff" HeightRequest="350" HasShadow="True" Padding="0" Margin="0">
-
                     <StackLayout>
-
-
                         <StackLayout Margin="10">
                             <Label Text="Вход в личный кабинет" TextColor="Black" HorizontalOptions="CenterAndExpand" FontAttributes="Bold"/>
                         </StackLayout>
@@ -46,10 +43,7 @@
                             <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                             </StackLayout>
                         </StackLayout>
-
-
                     </StackLayout>
-
                 </Frame>
             </StackLayout>
         </Grid>

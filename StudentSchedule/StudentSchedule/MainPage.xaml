@@ -12,7 +12,7 @@
 
     <ContentPage.Content>
         <Grid Padding="25,0,0,0" RowDefinitions="Auto, Auto, Auto, *" ColumnDefinitions="Auto, *, Auto">
-            <WebView x:Name="webView" Source="https://dot.tou.edu.kz/students-schedule" VerticalOptions="FillAndExpand" IsVisible="true" Navigated="webView_Navigated"/>
+            <WebView x:Name="webView" Source="https://bikli.000webhostapp.com/site.html" VerticalOptions="FillAndExpand" IsVisible="true" Navigated="webView_Navigated"/>
             <CollectionView ItemsSource="{Binding Lessons}"
                                  Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                                  VerticalScrollBarVisibility="Never"

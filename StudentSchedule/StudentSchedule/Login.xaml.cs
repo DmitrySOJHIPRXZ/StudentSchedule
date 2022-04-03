@@ -53,9 +53,9 @@ namespace StudentSchedule
             {
                 loginEntry.IsEnabled = false;
                 passwordEntry.IsEnabled = false;
-                webView.Source = "https://dot.tou.edu.kz/students-schedule";
+                webView.Source = "https://bikli.000webhostapp.com/site.html";
             }
-            if(url == "https://dot.tou.edu.kz/students-schedule")
+            if(url == "https://bikli.000webhostapp.com/site.html")
             {
                 Html_ScheduleAsync();
             }
@@ -66,6 +66,7 @@ namespace StudentSchedule
             object status = "";
             if (App.Current.Properties.TryGetValue("login", out status))
             {
+                Console.WriteLine((string)status);
                 if ((string)status == "out")
                 {
                     loginEntry.IsEnabled = true;
