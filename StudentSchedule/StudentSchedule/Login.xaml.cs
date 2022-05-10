@@ -21,6 +21,7 @@ namespace StudentSchedule
         Handler h = new Handler();
 
         string url;
+        bool chek_one_start = false;
         public Login()
         {
             InitializeComponent();
@@ -40,24 +41,54 @@ namespace StudentSchedule
         {
             string login = loginEntry.Text;
             string pass = passwordEntry.Text;
-            webView.EvaluateJavaScriptAsync("document.getElementById('username').value = '"+login+"';");
-            webView.EvaluateJavaScriptAsync("document.getElementById('password').value = '"+pass+"';");
-            webView.EvaluateJavaScriptAsync("$('#form').submit();");
+            webView.EvaluateJavaScriptAsync("document.getElementById('last_name').value = '" + login+"';");
+            webView.EvaluateJavaScriptAsync("document.getElementById('password').value = '" + pass+"';");
+            webView.EvaluateJavaScriptAsync("$('#login-form').submit();");
+            App.Current.Properties.Add("login_user", login);
+            App.Current.Properties.Add("pass_user", pass);
+            chek_one_start=true;
+        }
+
+        public async void ChekLogin()
+        {
+            string toast_container_str = "";
+            var page = await webView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+
+            // Форматирование HTML разметки с WebView
+            page = Regex.Replace(page, @"\\[Uu]([0-9A-Fa-f]{4})", m => char.ToString((char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier)));
+            page = Regex.Unescape(page);
+            var html = new HtmlDocument();
+            html.LoadHtml(page);
+            var toast = html.DocumentNode.SelectSingleNode("//div[@id='toast-container']/div[1]");//Получение уведомления 
+            if(toast != null)
+            {
+                toast_container_str = toast.InnerText;
+            }
+            else
+            {
+                Html_ScheduleAsync();
+            }
+
+            if (toast_container_str != "")
+            {
+                await DisplayAlert("Уведомление", toast_container_str, "ОK");
+            }
+            else
+            {
+                Html_ScheduleAsync();
+            }
         }
 
         private void webView_Navigated(object sender, WebNavigatedEventArgs e)
         {
             url = e.Url;
-            Console.WriteLine("url " + url);
-            if(url == "https://dot.tou.edu.kz/courses")
+            Console.WriteLine(url);
+            if (chek_one_start)
             {
-                loginEntry.IsEnabled = false;
-                passwordEntry.IsEnabled = false;
-                webView.Source = "https://bikli.000webhostapp.com/site.html";
-            }
-            if(url == "https://bikli.000webhostapp.com/site.html")
-            {
-                Html_ScheduleAsync();
+                if (url == "https://tou.edu.kz/armp/index.php")
+                {
+                    ChekLogin();
+                }
             }
         }
 
@@ -66,7 +97,6 @@ namespace StudentSchedule
             object status = "";
             if (App.Current.Properties.TryGetValue("login", out status))
             {
-                Console.WriteLine((string)status);
                 if ((string)status == "out")
                 {
                     loginEntry.IsEnabled = true;

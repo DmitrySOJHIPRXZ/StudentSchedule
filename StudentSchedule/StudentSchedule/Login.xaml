@@ -5,12 +5,13 @@
     <StackLayout BackgroundColor="#e6e6e6">
         <Grid>
             <StackLayout Padding="0" Margin="0" HorizontalOptions="FillAndExpand">
-                <WebView x:Name="webView" Source="https://dot.tou.edu.kz/auth/login" VerticalOptions="FillAndExpand"  Navigated="webView_Navigated" IsVisible="false"/>
+                
                 <Frame HeightRequest="800" BackgroundColor="HotPink" Padding="0" Margin="0">
-                    <Image Source="https://img1.akspic.ru/originals/1/7/9/0/5/150971-spokojnyj-atmosfera-oblako-raduga-cvet-1080x1920.jpg" Aspect="AspectFill" Margin="0"/>
+                    <Image Source="Gradient.jpg" Aspect="AspectFill" Margin="0"/>
                 </Frame>
             </StackLayout>
             <StackLayout Padding="0" Margin="40,100,40,0" HorizontalOptions="FillAndExpand">
+                <WebView x:Name="webView" Source="https://tou.edu.kz/armp/index.php" VerticalOptions="FillAndExpand"  Navigated="webView_Navigated" IsVisible="false"/>
                 <Frame  BackgroundColor="#00ffffff" HeightRequest="350" HasShadow="True" Padding="0" Margin="0">
                     <StackLayout>
                         <StackLayout Margin="10">
@@ -22,7 +23,7 @@
                             <Frame BackgroundColor="Transparent" BorderColor="DarkGray" Padding="0" HorizontalOptions="FillAndExpand" CornerRadius="30">
                                 <StackLayout Orientation="Horizontal">
                                     <Frame BackgroundColor="SkyBlue" HeightRequest="40" WidthRequest="40" CornerRadius="30" Padding="0" Margin="5">
-                                        <Image Source="https://www.findool.com/images/avatars/avatar.png" Aspect="AspectFill" Margin="0"/>
+                                        <Image Source="avatar.png" Aspect="AspectFill" Margin="0"/>
                                     </Frame>
 
                                     <Entry x:Name="loginEntry" Placeholder="Фамилия/логин" TextColor="HotPink" FontAttributes="None" HorizontalOptions="FillAndExpand" Margin="0,0,20,0"/>
@@ -32,7 +33,7 @@
                             <Frame BackgroundColor="Transparent" BorderColor="DarkGray" Margin="0,15,0,0" Padding="0" HorizontalOptions="FillAndExpand" CornerRadius="30">
                                 <StackLayout Orientation="Horizontal">
                                     <Frame BackgroundColor="SkyBlue" HeightRequest="40" WidthRequest="40" CornerRadius="30" Padding="0" Margin="5">
-                                        <Image Source="https://images.all-free-download.com/images/graphicthumb/lock_icon_6813906.jpg" Aspect="AspectFill" Margin="0"/>
+                                        <Image Source="pass.jpg" Aspect="AspectFill" Margin="0"/>
                                     </Frame>
 
                                     <Entry x:Name="passwordEntry" Placeholder="Пароль" IsPassword="True" TextColor="HotPink" FontAttributes="None" HorizontalOptions="FillAndExpand" Margin="0,0,20,0"/>

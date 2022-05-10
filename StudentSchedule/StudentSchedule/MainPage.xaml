@@ -3,27 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StudentSchedule.MainPage">
     <NavigationPage.TitleView>
-        <Label Text="Расписание на сегодня"/>
-        
+        <Label x:Name="NavTitle" TextColor="White" Text="Расписание на"/>
     </NavigationPage.TitleView>
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Обновить" Clicked="ToolbarItem_Clicked"/>
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <Grid Padding="25,0,0,0" RowDefinitions="Auto, Auto, Auto, *" ColumnDefinitions="Auto, *, Auto">
-            <WebView x:Name="webView" Source="https://bikli.000webhostapp.com/site.html" VerticalOptions="FillAndExpand" IsVisible="true" Navigated="webView_Navigated"/>
-            <CollectionView ItemsSource="{Binding Lessons}"
+        <Grid Padding="25,0,0,0" RowDefinitions="Auto, Auto, Auto, *" ColumnDefinitions="Auto, *, Auto" BackgroundColor="AliceBlue">
+            <WebView x:Name="webView"  VerticalOptions="FillAndExpand" IsVisible="false" Navigated="webView_Navigated"/>
+            <CollectionView ItemsSource="{Binding Lessons}" 
                                  Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                                  VerticalScrollBarVisibility="Never"
-                                 VerticalOptions="Start">
+                                 VerticalOptions="Start"
+                                 x:Name="collectionView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *">
+
+                        <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *" BackgroundColor="AliceBlue">
                             <!-- Schedule time-->
-                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding data_time}"  TextColor="White" FontAttributes="Bold" VerticalOptions="Start"/>
+                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding data_time}"  TextColor="Black" FontAttributes="Bold" VerticalOptions="Start"/>
                             <!-- Vertical Line-->
-                            <BoxView Grid.Row="1" Grid.Column="0" WidthRequest="4" Color="White" HeightRequest="120" Margin="25,0,50,0" />
+                            <BoxView Grid.Row="1" Grid.Column="0" WidthRequest="4" Color="Black" HeightRequest="120" Margin="25,0,50,0" />
                             <!-- Card -->
                             <Frame Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="25" HasShadow="False" Margin="5,30,30,30" BackgroundColor="#4B0082">
                                 <StackLayout>
@@ -35,6 +36,7 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
         </Grid>
     </ContentPage.Content>
 </ContentPage>

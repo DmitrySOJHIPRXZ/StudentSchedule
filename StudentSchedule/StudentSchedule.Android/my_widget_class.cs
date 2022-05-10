@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +14,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using HtmlAgilityPack;
+using StudentSchedule;
 using StudentSchedule.Droid;
 
 namespace WidgetButtonClick.Droid
@@ -32,13 +34,11 @@ namespace WidgetButtonClick.Droid
         ArrayList classes;
         ArrayList days_of_weeks = new ArrayList();
         public List<Lesson> Lessons { get; set; }
-        string znam = "знам.";
-        string chisl = "числ.";
         string DayOfWeek = "";
         string type_week = "";
         string type_week_s = "";
-        public static String ACTION_WIDGET_TURNON = "Button 1 click";
-        public static String ACTION_WIDGET_TURNOFF = "Button 2 clickedddddd";
+        string file_name = "page_data";
+        string folderPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
         public override void OnUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
         {
             //Update Widget layout
@@ -63,164 +63,185 @@ namespace WidgetButtonClick.Droid
 
         private void SetTextViewText(RemoteViews widgetView)
         {
-            var html = @"https://bikli.000webhostapp.com/site.html";
-            HtmlWeb web  = new HtmlWeb();
-            var htmlDoc = web.Load(html);
-            var table = htmlDoc.DocumentNode.SelectSingleNode("//table[1]");//Получение первой табиоцы
-            var week = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='hide-on-med-and-up']/div[2]");//Получение типа недели
-            type_week = week.InnerText;
-            string[] words = type_week.ToString().Replace(" ", "").Split(',');
-
-
-            string week_s = words[1].Replace("\r", "");
-            week_s = week_s.Replace("\n", "");
-            //Определение типа недели и запись в переменную
-            if (week_s == "Числитель")
+            try
             {
-                type_week_s = "(числ.)";
-            }
-            else if (week_s == "Знаменатель")
-            {
-                type_week_s = "(знам.)";
-            }
-            var rows = table.Descendants("tr")
-                        .Select(tr => tr.Descendants("td").Select(td => td.InnerText).ToList());
-
-            //Сортировка строк таблицы
-            foreach (var row in rows)
-            {
-                foreach (var item in row)
+                if (File.Exists(Path.Combine(folderPath, file_name)))
                 {
-                    switch (item)
+                    DateTime dateTime = DateTime.Now;
+                    DayOfWeek = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetDayName(dateTime.DayOfWeek);
+                    //var html = @"https://bikli.000webhostapp.com/site.html";
+                    //HtmlWeb web = new HtmlWeb();
+                    //var htmlDoc = web.Load(html);
+                    var htmlDoc = new HtmlDocument();
+                    Console.WriteLine(File.ReadAllText(Path.Combine(folderPath, file_name)));
+                    htmlDoc.LoadHtml(File.ReadAllText(Path.Combine(folderPath, file_name)));
+                    var table = htmlDoc.DocumentNode.SelectSingleNode("//table[1]");//Получение первой табиоцы
+                    var week = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='hide-on-med-and-up']/div[2]");//Получение типа недели
+                    type_week = week.InnerText;
+                    string[] words = type_week.ToString().Replace(" ", "").Split(',');
+
+
+                    string week_s = words[1].Replace("\r", "");
+                    week_s = week_s.Replace("\n", "");
+                    //Определение типа недели и запись в переменную
+                    if (week_s == "Числитель")
                     {
-                        case "Понедельник":
-                            classes = new ArrayList();
-                            days_of_weeks.Insert(0, classes);
-                            break;
-                        case "Вторник":
-                            classes = new ArrayList();
-                            days_of_weeks.Insert(1, classes);
-                            break;
-                        case "Среда":
-                            classes = new ArrayList();
-                            days_of_weeks.Insert(2, classes);
-                            break;
-                        case "Четверг":
-                            classes = new ArrayList();
-                            days_of_weeks.Insert(3, classes);
-                            break;
-                        case "Пятница":
-                            classes = new ArrayList();
-                            days_of_weeks.Insert(4, classes);
-                            break;
-                        default:
-                            if (item != "")
-                            {
-                                if (item.Length > 3)
-                                {
-                                    classes.Add(item);
-                                    break;
-                                }
-                            }
-                            break;
+                        type_week_s = "(числ.)";
                     }
-                }
-            }
-
-            int index_day = 0;
-            //Вывод расписания конкретного дня
-            if (DayOfWeek == "понедельник")
-            {
-                index_day = 0;
-            }
-            if (DayOfWeek == "вторник")
-            {
-                index_day = 1;
-            }
-            if (DayOfWeek == "среда")
-            {
-                index_day = 2;
-            }
-            if (DayOfWeek == "четверг")
-            {
-                index_day = 3;
-            }
-            if (DayOfWeek == "пятница")
-            {
-                index_day = 4;
-            }
-            if (DayOfWeek == "суббота")
-            {
-                index_day = 0;
-            }
-            if (DayOfWeek == "воскресенье")
-            {
-                index_day = 0;
-            }
-
-            ArrayList day = (ArrayList)days_of_weeks[index_day];
-            int i = 0;
-            Lessons = new List<Lesson>();
-            string data_time = "";
-            string teacher = "";
-            foreach (var item in day)
-            {
-                if (i == 0)
-                {
-                    data_time = item.ToString();
-                    i++;
-                }
-                else if (i == 1)
-                {
-                    teacher = item.ToString().Replace("\n", "");
-                    if (type_week_s == "(числ.)")
+                    else if (week_s == "Знаменатель")
                     {
-                        if (teacher.IndexOf(type_week_s) != -1)
+                        type_week_s = "(знам.)";
+                    }
+                    var rows = table.Descendants("tr")
+                                .Select(tr => tr.Descendants("td").Select(td => td.InnerText).ToList());
+
+                    //Сортировка строк таблицы
+                    foreach (var row in rows)
+                    {
+                        foreach (var item in row)
                         {
-                            teacher = teacher.Substring(0, teacher.IndexOf(type_week_s));
+                            switch (item)
+                            {
+                                case "Понедельник":
+                                    classes = new ArrayList();
+                                    days_of_weeks.Insert(0, classes);
+                                    break;
+                                case "Вторник":
+                                    classes = new ArrayList();
+                                    days_of_weeks.Insert(1, classes);
+                                    break;
+                                case "Среда":
+                                    classes = new ArrayList();
+                                    days_of_weeks.Insert(2, classes);
+                                    break;
+                                case "Четверг":
+                                    classes = new ArrayList();
+                                    days_of_weeks.Insert(3, classes);
+                                    break;
+                                case "Пятница":
+                                    classes = new ArrayList();
+                                    days_of_weeks.Insert(4, classes);
+                                    break;
+                                default:
+                                    if (item != "")
+                                    {
+                                        if (item.Length > 3)
+                                        {
+                                            classes.Add(item);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                            }
                         }
                     }
-                    else if (type_week_s == "(знам.)")
+
+                    int index_day = 0;
+                    //Вывод расписания конкретного дня
+                    if (DayOfWeek == "понедельник")
                     {
-                        if (teacher.IndexOf(type_week_s) != -1)
+                        index_day = 0;
+                    }
+                    if (DayOfWeek == "вторник")
+                    {
+                        index_day = 1;
+                    }
+                    if (DayOfWeek == "среда")
+                    {
+                        index_day = 2;
+                    }
+                    if (DayOfWeek == "четверг")
+                    {
+                        index_day = 3;
+                    }
+                    if (DayOfWeek == "пятница")
+                    {
+                        index_day = 4;
+                    }
+                    if (DayOfWeek == "суббота")
+                    {
+                        index_day = 0;
+                    }
+                    if (DayOfWeek == "воскресенье")
+                    {
+                        index_day = 0;
+                    }
+
+                    ArrayList day = (ArrayList)days_of_weeks[index_day];
+                    int i = 0;
+                    Lessons = new List<Lesson>();
+                    string data_time = "";
+                    string teacher = "";
+                    foreach (var item in day)
+                    {
+                        if (i == 0)
                         {
-                            teacher = teacher.Substring(teacher.IndexOf("(числ.)"));
-                            if (teacher.Length == 14)
+                            data_time = item.ToString();
+                            i++;
+                        }
+                        else if (i == 1)
+                        {
+                            teacher = item.ToString().Replace("\n", "");
+                            if (type_week_s == "(числ.)")
                             {
+                                if (teacher.IndexOf(type_week_s) != -1)
+                                {
+                                    teacher = teacher.Substring(0, teacher.IndexOf(type_week_s));
+                                }
+                            }
+                            else if (type_week_s == "(знам.)")
+                            {
+                                if (teacher.IndexOf(type_week_s) != -1)
+                                {
+                                    teacher = teacher.Substring(teacher.IndexOf("(числ.)"));
+                                    if (teacher.Length == 14)
+                                    {
+                                        teacher = "";
+                                    }
+                                }
+                            }
+                            i = 0;
+                        }
+                        if (data_time != "")
+                        {
+                            if (teacher != "")
+                            {
+                                Lessons.Add(new Lesson { lesson = "Занятие", data_time = data_time, teacher = teacher });
+                                data_time = "";
                                 teacher = "";
                             }
                         }
                     }
-                    i = 0;
-                }
-                if (data_time != "")
-                {
-                    if (teacher != "")
-                    {
-                        Lessons.Add(new Lesson { lesson = "Занятие", data_time = data_time, teacher = teacher });
-                        data_time = "";
-                        teacher = "";
-                    }
-                }
-            }
 
-            foreach(var time in Lessons)
-            {
-                DateTime dateTimeStart;
-                if (DateTime.TryParse(time.data_time.Substring(0, 5), DateTimeFormatInfo.InvariantInfo,
-                    DateTimeStyles.None, out dateTimeStart))
-                {
-                    DateTime dateTimeNow = DateTime.Now;
-                    if (dateTimeNow < dateTimeStart)
+                    foreach (var time in Lessons)
                     {
-                        TimeSpan remaining = dateTimeNow - dateTimeStart;
-                        string remaining_str = remaining.ToString();
-                        widgetView.SetTextViewText(Resource.Id.textView1, "Время до следущего урока : " + 
-                            remaining_str.Substring(1,8) + " Часов");
-                        break;
+                        DateTime dateTimeStart;
+                        if (DateTime.TryParse(time.data_time.Substring(0, 5), DateTimeFormatInfo.InvariantInfo,
+                            DateTimeStyles.None, out dateTimeStart))
+                        {
+                            DateTime dateTimeNow = DateTime.Now;
+                            Console.WriteLine(dateTimeNow);
+                            Console.WriteLine(dateTimeStart);
+                            if (dateTimeNow < dateTimeStart)
+                            {
+                                TimeSpan remaining = dateTimeNow - dateTimeStart;
+                                string remaining_str = remaining.ToString();
+                                widgetView.SetTextViewText(Resource.Id.textView1, "Следующий урок : " + time.teacher + " черезе " +
+                                    remaining_str.Substring(1, 8) + " Часов ");
+                                break;
+                            }
+                        }
                     }
                 }
+                else
+                {
+                    widgetView.SetTextViewText(Resource.Id.textView1, "Для использавнаия виджета, пожалуйста авторизуйтесь в приложении");
+                }
             }
+            catch (Exception ex)
+            {
+                widgetView.SetTextViewText(Resource.Id.textView1, ex.ToString());
+            }                   
         }
 
         private void RegisterClicks(Context context, int[] appWidgetIds, RemoteViews widgetView)

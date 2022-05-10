@@ -2,9 +2,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,23 +25,35 @@ namespace StudentSchedule
     {
         ArrayList classes;
         ArrayList days_of_weeks = new ArrayList();
-        public List<Lesson> Lessons { get; set; }
-        string znam = "знам.";
-        string chisl = "числ.";
+        //public List<Lesson> Lessons { get; set; }
+        public ObservableCollection<Lesson> Lessons { get; set; }
         string DayOfWeek = "";
         string type_week = "";
         string type_week_s = "";
+        string file_name = "page_data";
+        string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string URL = "https://bikli.000webhostapp.com/site.html";
         public MainPage()
         {
+            //https://tou.edu.kz/armp/?lang=rus&menu=calendar&mod=shedule_prep_kaf
             InitializeComponent();
+            webView.Source = URL;
             App.Current.Properties["login"] = "in";
             NavigationPage.SetHasBackButton(this, true);
-            
+            Lessons = new ObservableCollection<Lesson> {
+                new Lesson { lesson = "Загрузка", data_time = "", teacher = "" }
+            };
+            this.BindingContext = this;
+
         }
         protected override bool OnBackButtonPressed()
         {
             return true;
         }
+
+        
+
+
 
         public async void LoadSchedule()
         {
@@ -50,16 +64,18 @@ namespace StudentSchedule
             var page = await webView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
 
             // Форматирование HTML разметки с WebView
+            await webView.EvaluateJavaScriptAsync("document.getElementsByName( 'week_no' ).item( 0 ).selectedIndex = 24;");
             page = Regex.Replace(page, @"\\[Uu]([0-9A-Fa-f]{4})", m => char.ToString((char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier)));
             page = Regex.Unescape(page);
+            Path.Combine(folderPath, file_name);
+            File.WriteAllText(Path.Combine(folderPath, file_name),page.ToString());
             var html = new HtmlDocument();
             html.LoadHtml(page);
             var table = html.DocumentNode.SelectSingleNode("//table[1]");//Получение первой табиоцы
             var week = html.DocumentNode.SelectSingleNode("//div[@class='hide-on-med-and-up']/div[2]");//Получение типа недели
             type_week = week.InnerText;
             string[] words = type_week.ToString().Replace(" ","").Split(',');
-
-
+            string type_weeks = words[0].Substring(8);
             string week_s = words[1].Replace("\n","");
             //Определение типа недели и запись в переменную
             if (week_s == "Числитель")
@@ -70,6 +86,7 @@ namespace StudentSchedule
             {
                 type_week_s = "(знам.)";
             }
+            Console.WriteLine(type_week_s);
             //Получение всех строк таблицы 
             var rows = table.Descendants("tr")
                 .Select(tr => tr.Descendants("td").Select(td => td.InnerText).ToList());
@@ -101,6 +118,10 @@ namespace StudentSchedule
                             classes = new ArrayList();
                             days_of_weeks.Insert(4, classes);
                             break;
+                        case "Суббота":
+                            break;
+                        case "Воскресенье":
+                            break;
                         default:
                             if(item != "")
                             {
@@ -117,6 +138,7 @@ namespace StudentSchedule
 
 
             int index_day = 0;
+            NavTitle.Text = "Расписание на " + DayOfWeek + ", " + week_s;
             //Вывод расписания конкретного дня
             if(DayOfWeek == "понедельник")
             {
@@ -144,11 +166,12 @@ namespace StudentSchedule
             }
             if (DayOfWeek == "воскресенье")
             {
-                index_day = 2;
+                index_day = 0;
             }
             ArrayList day = (ArrayList)days_of_weeks[index_day];
+            Lessons.Clear();
             int i = 0;
-            Lessons = new List<Lesson>();
+            //Lessons = new List<Lesson>();
             string data_time = "";
             string teacher = "";
             foreach (var item in day)
@@ -193,13 +216,13 @@ namespace StudentSchedule
 
 
             }
-            this.BindingContext = this;
         }
 
         private void webView_Navigated(object sender, WebNavigatedEventArgs e)
         {
             var url = e.Url;
-            if (url == "https://bikli.000webhostapp.com/site.html")
+            Console.WriteLine(url);
+            if (url == URL)
             {
                 LoadSchedule();
             }
@@ -207,12 +230,11 @@ namespace StudentSchedule
 
         private void ToolbarItem_Clicked(object sender, EventArgs e)
         {
-            LoadSchedule();
+            webView.Source = URL;
         }
 
         protected override void OnDisappearing()
         {
-            Console.WriteLine("123");
             App.Current.Properties["login"] = "out";
         }
     }
