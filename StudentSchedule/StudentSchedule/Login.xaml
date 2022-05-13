@@ -2,6 +2,9 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StudentSchedule.Login" IsBusy="False">
+    <NavigationPage.TitleView>
+        <Label x:Name="NavTitle" TextColor="White" Text="Расписание преподавателей"/>
+    </NavigationPage.TitleView>
     <StackLayout BackgroundColor="#e6e6e6">
         <Grid>
             <StackLayout Padding="0" Margin="0" HorizontalOptions="FillAndExpand">
@@ -39,7 +42,9 @@
                                     <Entry x:Name="passwordEntry" Placeholder="Пароль" IsPassword="True" TextColor="HotPink" FontAttributes="None" HorizontalOptions="FillAndExpand" Margin="0,0,20,0"/>
                                 </StackLayout>
                             </Frame>
-
+                            <Label Text="Запомнить данные" TextColor="Black" HorizontalOptions="CenterAndExpand" FontAttributes="Bold"/>
+                            <Switch IsToggled="False" VerticalOptions="CenterAndExpand"
+                                    HorizontalOptions="Center" Toggled="Switch_Toggled" />
                             <Button x:Name="btn_login" Clicked="btn_login_Clicked" Text="Войти" BackgroundColor="HotPink" TextColor="White" CornerRadius="30" />
                             <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                             </StackLayout>

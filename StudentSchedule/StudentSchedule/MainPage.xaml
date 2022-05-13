@@ -11,6 +11,7 @@
 
     <ContentPage.Content>
         <Grid Padding="25,0,0,0" RowDefinitions="Auto, Auto, Auto, *" ColumnDefinitions="Auto, *, Auto" BackgroundColor="AliceBlue">
+            <ActivityIndicator x:Name="Preloder" Margin="150"  IsRunning="true" />
             <WebView x:Name="webView"  VerticalOptions="FillAndExpand" IsVisible="false" Navigated="webView_Navigated"/>
             <CollectionView ItemsSource="{Binding Lessons}" 
                                  Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
@@ -26,7 +27,7 @@
                             <!-- Vertical Line-->
                             <BoxView Grid.Row="1" Grid.Column="0" WidthRequest="4" Color="Black" HeightRequest="120" Margin="25,0,50,0" />
                             <!-- Card -->
-                            <Frame Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="25" HasShadow="False" Margin="5,30,30,30" BackgroundColor="#4B0082">
+                            <Frame Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="25" HasShadow="True" Margin="5,30,30,30" BackgroundColor="#4B0082">
                                 <StackLayout>
                                     <Label Text="{Binding lesson}" FontAttributes="Bold" TextColor="White" FontSize="18"/>
                                     <Label Text="{Binding teacher}" TextColor="White" FontSize="18"/>
@@ -36,7 +37,6 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-
         </Grid>
     </ContentPage.Content>
 </ContentPage>

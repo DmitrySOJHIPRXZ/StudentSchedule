@@ -15,6 +15,7 @@ using Android.App;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
+[assembly: Application(Icon = "@mipmap/ic_launcher")]
 
 // Version information for an assembly consists of the following four values:
 //

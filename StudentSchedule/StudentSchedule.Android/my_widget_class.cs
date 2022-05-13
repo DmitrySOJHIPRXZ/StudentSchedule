@@ -26,7 +26,7 @@ namespace WidgetButtonClick.Droid
         public string teacher { get; set; }
     }
 
-    [BroadcastReceiver(Label = "StudentSchedule")]
+    [BroadcastReceiver(Label = "TouSchedule")]
     [IntentFilter(new string[] { "android.appwidget.action.APPWIDGET_UPDATE" })]
     [MetaData("android.appwidget.provider", Resource = "@xml/my_widget_provider")]
     public class my_widget_class : AppWidgetProvider

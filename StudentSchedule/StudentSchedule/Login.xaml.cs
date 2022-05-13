@@ -39,13 +39,41 @@ namespace StudentSchedule
 
         private void btn_login_Clicked(object sender, EventArgs e)
         {
-            string login = loginEntry.Text;
-            string pass = passwordEntry.Text;
-            webView.EvaluateJavaScriptAsync("document.getElementById('last_name').value = '" + login+"';");
-            webView.EvaluateJavaScriptAsync("document.getElementById('password').value = '" + pass+"';");
-            webView.EvaluateJavaScriptAsync("$('#login-form').submit();");
-            App.Current.Properties.Add("login_user", login);
-            App.Current.Properties.Add("pass_user", pass);
+            string login = "";
+            string pass = "";
+            login = loginEntry.Text;
+            pass = passwordEntry.Text;
+            if(login != null)
+            {
+                if(login != "")
+                {
+                    if (pass != null)
+                    {
+                        if(pass != "")
+                        {
+                            webView.EvaluateJavaScriptAsync("document.getElementById('last_name').value = '" + login + "';");
+                            webView.EvaluateJavaScriptAsync("document.getElementById('password').value = '" + pass + "';");
+                            webView.EvaluateJavaScriptAsync("$('#login-form').submit();");
+                        }
+                        else
+                        {
+                            DisplayAlert("Уведомление", "Введите пароль", "ОK");
+                        }
+                    }
+                    else
+                    {
+                        DisplayAlert("Уведомление", "Введите пароль", "ОK");
+                    }
+                }
+                else
+                {
+                    DisplayAlert("Уведомление", "Введите логин", "ОK");
+                }
+            }
+            else
+            {
+                DisplayAlert("Уведомление", "Введите логин", "ОK");
+            }
             chek_one_start=true;
         }
 
@@ -82,7 +110,6 @@ namespace StudentSchedule
         private void webView_Navigated(object sender, WebNavigatedEventArgs e)
         {
             url = e.Url;
-            Console.WriteLine(url);
             if (chek_one_start)
             {
                 if (url == "https://tou.edu.kz/armp/index.php")
@@ -90,18 +117,85 @@ namespace StudentSchedule
                     ChekLogin();
                 }
             }
+            else
+            {
+                if (url == "https://tou.edu.kz/armp/index.php")
+                {
+                    AutoLog();
+                }
+            }
+        }
+
+        private void AutoLog()
+        {
+            object status = "";
+            if (App.Current.Properties.TryGetValue("login_user", out status))
+            {
+                string login = App.Current.Properties["login_user"].ToString();
+                string pass = App.Current.Properties["pass_user"].ToString();
+                if (login != null)
+                {
+                    if (login != "")
+                    {
+                        if (pass != null)
+                        {
+                            if (pass != "")
+                            {
+                                loginEntry.Text = login;
+                                passwordEntry.Text = pass;
+                                webView.EvaluateJavaScriptAsync("document.getElementById('last_name').value = '" + login + "';");
+                                webView.EvaluateJavaScriptAsync("document.getElementById('password').value = '" + pass + "';");
+                                webView.EvaluateJavaScriptAsync("$('#login-form').submit();");
+                            }
+                            else
+                            {
+                                DisplayAlert("Уведомление", "Введите пароль", "ОK");
+                            }
+                        }
+                        else
+                        {
+                            DisplayAlert("Уведомление", "Введите пароль", "ОK");
+                        }
+                    }
+                    else
+                    {
+                        DisplayAlert("Уведомление", "Введите логин", "ОK");
+                    }
+                }
+                else
+                {
+                    DisplayAlert("Уведомление", "Введите логин", "ОK");
+                }
+                chek_one_start = true;
+            }
         }
 
         protected override void OnAppearing()
         {
-            object status = "";
-            if (App.Current.Properties.TryGetValue("login", out status))
+        }
+
+        private void Switch_Toggled(object sender, ToggledEventArgs e)//исправить ошибку, запоминанеи только после успешной авторизации 
+        {
+            string login = loginEntry.Text;
+            string pass = passwordEntry.Text;
+            if (login != null)
             {
-                if ((string)status == "out")
+                if (login != "")
                 {
-                    loginEntry.IsEnabled = true;
-                    passwordEntry.IsEnabled = true;
-                    webView.Source = "https://dot.tou.edu.kz/auth/logout";
+                    if (pass != null)
+                    {
+                        if (pass != "")
+                        {
+                            object status = "";
+                            if (App.Current.Properties.TryGetValue("login_user", out status))
+                            { }
+                            else
+                            {
+                                App.Current.Properties.Add("login_user", login);
+                                App.Current.Properties.Add("pass_user", pass);
+                            }
+                        }
+                    }
                 }
             }
         }

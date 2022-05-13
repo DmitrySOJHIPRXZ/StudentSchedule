@@ -33,16 +33,14 @@ namespace StudentSchedule
         string file_name = "page_data";
         string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         string URL = "https://bikli.000webhostapp.com/site.html";
+        ActivityIndicator activityIndicator;
         public MainPage()
         {
             //https://tou.edu.kz/armp/?lang=rus&menu=calendar&mod=shedule_prep_kaf
             InitializeComponent();
             webView.Source = URL;
-            App.Current.Properties["login"] = "in";
             NavigationPage.SetHasBackButton(this, true);
-            Lessons = new ObservableCollection<Lesson> {
-                new Lesson { lesson = "Загрузка", data_time = "", teacher = "" }
-            };
+            Lessons = new ObservableCollection<Lesson> {};
             this.BindingContext = this;
 
         }
@@ -51,12 +49,11 @@ namespace StudentSchedule
             return true;
         }
 
-        
-
 
 
         public async void LoadSchedule()
         {
+            activityIndicator = new ActivityIndicator { IsRunning = true };
             //Определения дня недели
             DateTime dateTime = DateTime.Now;
             DayOfWeek = CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetDayName(dateTime.DayOfWeek);
@@ -216,6 +213,8 @@ namespace StudentSchedule
 
 
             }
+            Preloder.IsRunning = false;
+            Preloder.IsVisible = false;
         }
 
         private void webView_Navigated(object sender, WebNavigatedEventArgs e)
@@ -235,7 +234,6 @@ namespace StudentSchedule
 
         protected override void OnDisappearing()
         {
-            App.Current.Properties["login"] = "out";
         }
     }
 }
