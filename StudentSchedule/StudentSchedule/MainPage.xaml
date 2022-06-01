@@ -11,13 +11,20 @@
 
     <ContentPage.Content>
         <Grid Padding="25,0,0,0" RowDefinitions="Auto, Auto, Auto, *" ColumnDefinitions="Auto, *, Auto" BackgroundColor="AliceBlue">
-            <ActivityIndicator x:Name="Preloder" Margin="150"  IsRunning="true" />
-            <WebView x:Name="webView"  VerticalOptions="FillAndExpand" IsVisible="false" Navigated="webView_Navigated"/>
+            <ActivityIndicator IsVisible="true" x:Name="Preloder" Margin="150"  IsRunning="true" />
+            <Button x:Name="btn1" Grid.Row="1" Grid.Column="0" TextColor="Black" Clicked="Button_Clicked" IsVisible="false" Text="Нажмите что бы выбрать неделю"></Button>
+            <ScrollView x:Name="scroll" IsVisible="false" Grid.Row="0" Grid.Column="1">
+                <AbsoluteLayout>
+                    <WebView AbsoluteLayout.LayoutBounds="0,0,800,195" x:Name="webView"  VerticalOptions="FillAndExpand" IsVisible="false" Navigated="webView_Navigated"/>
+                    <BoxView AbsoluteLayout.LayoutBounds="0,0,1000,100" Color="White"></BoxView>
+                </AbsoluteLayout>
+            </ScrollView>
             <CollectionView ItemsSource="{Binding Lessons}" 
-                                 Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                                 Grid.Row="3" Grid.Column="0"
                                  VerticalScrollBarVisibility="Never"
                                  VerticalOptions="Start"
-                                 x:Name="collectionView">
+                                 x:Name="collectionView"
+                                 IsVisible="true">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
 

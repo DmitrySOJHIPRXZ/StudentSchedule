@@ -43,8 +43,8 @@
                                 </StackLayout>
                             </Frame>
                             <Label Text="Запомнить данные" TextColor="Black" HorizontalOptions="CenterAndExpand" FontAttributes="Bold"/>
-                            <Switch IsToggled="False" VerticalOptions="CenterAndExpand"
-                                    HorizontalOptions="Center" Toggled="Switch_Toggled" />
+                            <Switch  VerticalOptions="CenterAndExpand"
+                                    HorizontalOptions="Center" Toggled="Switch_Toggled" x:Name="Switch"/>
                             <Button x:Name="btn_login" Clicked="btn_login_Clicked" Text="Войти" BackgroundColor="HotPink" TextColor="White" CornerRadius="30" />
                             <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                             </StackLayout>

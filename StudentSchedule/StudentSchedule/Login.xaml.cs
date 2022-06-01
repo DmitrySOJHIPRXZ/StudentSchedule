@@ -19,12 +19,36 @@ namespace StudentSchedule
     {
         [Obsolete]
         Handler h = new Handler();
+        INotificationManager notificationManager;
 
         string url;
         bool chek_one_start = false;
         public Login()
         {
             InitializeComponent();
+            object status = "";
+            if (App.Current.Properties.TryGetValue("switch_toogle", out status))
+            {
+                Switch.IsToggled = true;
+            }
+            notificationManager = DependencyService.Get<INotificationManager>();
+            notificationManager.NotificationReceived += (sender, eventArgs) =>
+            {
+                var evtData = (NotificationEventArgs)eventArgs;
+                ShowNotification(evtData.Title, evtData.Message);
+            };
+            //notificationManager.SendNotification("Title", "Message", DateTime.Now.AddSeconds(10));
+        }
+
+        void ShowNotification(string title, string message)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                var msg = new Label()
+                {
+                    Text = $"Notification Received:\nTitle: {title}\nMessage: {message}"
+                };
+            });
         }
 
         public void Html_ScheduleAsync()
@@ -79,6 +103,10 @@ namespace StudentSchedule
 
         public async void ChekLogin()
         {
+            string login = "";
+            string pass = "";
+            login = loginEntry.Text;
+            pass = passwordEntry.Text;
             string toast_container_str = "";
             var page = await webView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
 
@@ -91,19 +119,48 @@ namespace StudentSchedule
             if(toast != null)
             {
                 toast_container_str = toast.InnerText;
+                if (toast_container_str != "")
+                {
+                    await DisplayAlert("Уведомление", toast_container_str, "ОK");
+                }
+                else
+                {
+                    if (Switch.IsToggled)
+                    {
+                        Save_user_data(login, pass);
+                    }
+                    Html_ScheduleAsync();
+                }
             }
             else
             {
+                if(Switch.IsToggled)
+                {
+                    Save_user_data(login, pass);
+                }
                 Html_ScheduleAsync();
             }
+        }
 
-            if (toast_container_str != "")
+        public async void CheckSession()
+        {
+            var page = await webView.EvaluateJavaScriptAsync("document.documentElement.outerHTML");
+            // Форматирование HTML разметки с WebView
+            page = Regex.Replace(page, @"\\[Uu]([0-9A-Fa-f]{4})", m => char.ToString((char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier)));
+            page = Regex.Unescape(page);
+            var html = new HtmlDocument();
+            html.LoadHtml(page);
+            var week = html.DocumentNode.SelectSingleNode("//div[@class='hide-on-med-and-up']/div[2]");//Получение типа недели
+            if(week != null)
             {
-                await DisplayAlert("Уведомление", toast_container_str, "ОK");
+                Html_ScheduleAsync();
             }
             else
             {
-                Html_ScheduleAsync();
+                if (Switch.IsToggled)
+                {
+                    AutoLog();
+                }
             }
         }
 
@@ -121,7 +178,7 @@ namespace StudentSchedule
             {
                 if (url == "https://tou.edu.kz/armp/index.php")
                 {
-                    AutoLog();
+                    CheckSession();
                 }
             }
         }
@@ -168,36 +225,25 @@ namespace StudentSchedule
                 }
                 chek_one_start = true;
             }
+            
         }
 
-        protected override void OnAppearing()
+
+        public void Save_user_data(string login,string pass)
         {
+            object status = "";
+            if (App.Current.Properties.TryGetValue("login_user", out status))
+            { }
+            else
+            {
+                App.Current.Properties.Add("login_user", login);
+                App.Current.Properties.Add("pass_user", pass);
+                App.Current.Properties.Add("switch_toogle", "true");
+            }
         }
 
         private void Switch_Toggled(object sender, ToggledEventArgs e)//исправить ошибку, запоминанеи только после успешной авторизации 
         {
-            string login = loginEntry.Text;
-            string pass = passwordEntry.Text;
-            if (login != null)
-            {
-                if (login != "")
-                {
-                    if (pass != null)
-                    {
-                        if (pass != "")
-                        {
-                            object status = "";
-                            if (App.Current.Properties.TryGetValue("login_user", out status))
-                            { }
-                            else
-                            {
-                                App.Current.Properties.Add("login_user", login);
-                                App.Current.Properties.Add("pass_user", pass);
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }

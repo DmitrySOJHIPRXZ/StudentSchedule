@@ -9,7 +9,7 @@ namespace StudentSchedule
         public App()
         {
             InitializeComponent();
-            MainPage = new NavigationPage(new Login());
+            MainPage = new NavigationPage(new MainPage());
         }
 
         protected override void OnStart()

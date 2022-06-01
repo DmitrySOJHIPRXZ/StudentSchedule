@@ -28,6 +28,7 @@ namespace WidgetButtonClick.Droid
 
     [BroadcastReceiver(Label = "TouSchedule")]
     [IntentFilter(new string[] { "android.appwidget.action.APPWIDGET_UPDATE" })]
+    [IntentFilter(new string[] { "android.appwidget.action.BTN_CLICK" })]
     [MetaData("android.appwidget.provider", Resource = "@xml/my_widget_provider")]
     public class my_widget_class : AppWidgetProvider
     {
@@ -39,6 +40,7 @@ namespace WidgetButtonClick.Droid
         string type_week_s = "";
         string file_name = "page_data";
         string folderPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+        public static string Btn_Click = "Btn_Click";
         public override void OnUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
         {
             //Update Widget layout
@@ -220,14 +222,12 @@ namespace WidgetButtonClick.Droid
                             DateTimeStyles.None, out dateTimeStart))
                         {
                             DateTime dateTimeNow = DateTime.Now;
-                            Console.WriteLine(dateTimeNow);
-                            Console.WriteLine(dateTimeStart);
                             if (dateTimeNow < dateTimeStart)
                             {
                                 TimeSpan remaining = dateTimeNow - dateTimeStart;
                                 string remaining_str = remaining.ToString();
-                                widgetView.SetTextViewText(Resource.Id.textView1, "Следующий урок : " + time.teacher + " черезе " +
-                                    remaining_str.Substring(1, 8) + " Часов ");
+                                widgetView.SetTextViewText(Resource.Id.textView1, "Следующий урок : " + time.teacher);
+                                widgetView.SetTextViewText(Resource.Id.textView2, "Время до урока : " + remaining_str.Substring(1, 8));
                                 break;
                             }
                         }
@@ -252,6 +252,8 @@ namespace WidgetButtonClick.Droid
 
             var piBackground = PendingIntent.GetBroadcast(context, 0, intent, PendingIntentFlags.UpdateCurrent);
             widgetView.SetOnClickPendingIntent(Resource.Id.widget, piBackground);
+            widgetView.SetOnClickPendingIntent(Resource.Id.button1, GetPendingSelfIntent(context,Btn_Click));
+
         }
 
         private PendingIntent GetPendingSelfIntent(Context context, string action)
@@ -263,6 +265,20 @@ namespace WidgetButtonClick.Droid
 
         public override void OnReceive(Context context, Intent intent)
         {
+            if (Btn_Click.Equals(intent.Action))
+            {
+                var pm = context.PackageManager;
+                try
+                {
+                    var packageName = "com.companyname.studentschedule";
+                    var launchIntent = pm.GetLaunchIntentForPackage(packageName);
+                    context.StartActivity(launchIntent);
+                }
+                catch
+                {
+                    // Something went wrong :)
+                }
+            }
             base.OnReceive(context, intent);
         }
     }

@@ -16,13 +16,17 @@ namespace StudentSchedule.Droid
         protected override void OnElementChanged(ElementChangedEventArgs<Entry> e)
         {
             base.OnElementChanged(e);
-
+            
             if (this.Control != null)
             {
                 this.Control.SetBackground(null);
                 this.Control.Gravity = GravityFlags.CenterVertical;
                 this.Control.SetPadding(0, 0, 0, 0);
+                
             }
+
+            
         }
+
     }
 }

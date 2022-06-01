@@ -24,5 +24,7 @@ namespace StudentSchedule.Droid
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+
+        
     }
 }
