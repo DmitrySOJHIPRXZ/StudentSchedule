@@ -37,17 +37,29 @@ namespace StudentSchedule
         {
             //https://tou.edu.kz/armp/?lang=rus&menu=calendar&mod=shedule_prep_kaf
             InitializeComponent();
+            object status = "";
+            if (App.Current.Properties.TryGetValue("login_user", out status))
+            {
+                if((string)status == "Test")
+                {
+                    URL = "https://bikli.000webhostapp.com/site.html";
+                }
+            }
             webView.Source = URL;
             NavigationPage.SetHasBackButton(this, true);
             Lessons = new ObservableCollection<Lesson> {};
             this.BindingContext = this;
+        }
+
+        protected override void OnAppearing()
+        {
+            NavigationPage.SetHasBackButton(this, false);
         }
         protected override bool OnBackButtonPressed()
         {
             App.Current.Properties.Remove("login_user");
             App.Current.Properties.Remove("pass_user");
             App.Current.Properties.Remove("switch_toogle");
-            webView.Source = "https://tou.edu.kz/armp/index.php?lang=rus&mod=logout";
             return true;
         }
 
@@ -412,15 +424,14 @@ namespace StudentSchedule
             }
         }
 
-        private void ToolbarItem_Clicked(object sender, EventArgs e)
+        private async void ToolbarItem_Clicked(object sender, EventArgs e)
         {
-            webView.Source = URL;
+            App.Current.Properties.Remove("login_user");
+            App.Current.Properties.Remove("pass_user");
+            App.Current.Properties.Remove("switch_toogle");
+            await Navigation.PopAsync();
         }
 
-        protected override void OnDisappearing()
-        {
-
-        }
 
         private void Button_Clicked(object sender, EventArgs e)
         {

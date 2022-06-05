@@ -26,11 +26,6 @@ namespace StudentSchedule
         public Login()
         {
             InitializeComponent();
-            object status = "";
-            if (App.Current.Properties.TryGetValue("switch_toogle", out status))
-            {
-                Switch.IsToggled = true;
-            }
             notificationManager = DependencyService.Get<INotificationManager>();
             notificationManager.NotificationReceived += (sender, eventArgs) =>
             {
@@ -67,17 +62,34 @@ namespace StudentSchedule
             string pass = "";
             login = loginEntry.Text;
             pass = passwordEntry.Text;
-            if(login != null)
+            if(login == "Test")
             {
-                if(login != "")
+                if(pass == "test")
                 {
-                    if (pass != null)
+                    App.Current.Properties.Add("login_user", login);
+                    App.Current.Properties.Add("pass_user", pass);
+                    App.Current.Properties.Add("switch_toogle", "true");
+                    Html_ScheduleAsync();
+                }
+            }
+            else
+            {
+                if (login != null)
+                {
+                    if (login != "")
                     {
-                        if(pass != "")
+                        if (pass != null)
                         {
-                            webView.EvaluateJavaScriptAsync("document.getElementById('last_name').value = '" + login + "';");
-                            webView.EvaluateJavaScriptAsync("document.getElementById('password').value = '" + pass + "';");
-                            webView.EvaluateJavaScriptAsync("$('#login-form').submit();");
+                            if (pass != "")
+                            {
+                                webView.EvaluateJavaScriptAsync("document.getElementById('last_name').value = '" + login + "';");
+                                webView.EvaluateJavaScriptAsync("document.getElementById('password').value = '" + pass + "';");
+                                webView.EvaluateJavaScriptAsync("$('#login-form').submit();");
+                            }
+                            else
+                            {
+                                DisplayAlert("Уведомление", "Введите пароль", "ОK");
+                            }
                         }
                         else
                         {
@@ -86,19 +98,15 @@ namespace StudentSchedule
                     }
                     else
                     {
-                        DisplayAlert("Уведомление", "Введите пароль", "ОK");
+                        DisplayAlert("Уведомление", "Введите логин", "ОK");
                     }
                 }
                 else
                 {
                     DisplayAlert("Уведомление", "Введите логин", "ОK");
                 }
+                chek_one_start = true;
             }
-            else
-            {
-                DisplayAlert("Уведомление", "Введите логин", "ОK");
-            }
-            chek_one_start=true;
         }
 
         public async void ChekLogin()
@@ -238,12 +246,38 @@ namespace StudentSchedule
             {
                 App.Current.Properties.Add("login_user", login);
                 App.Current.Properties.Add("pass_user", pass);
+                App.Current.Properties.Add("login", "in");
                 App.Current.Properties.Add("switch_toogle", "true");
             }
         }
 
         private void Switch_Toggled(object sender, ToggledEventArgs e)//исправить ошибку, запоминанеи только после успешной авторизации 
         {
+        }
+
+        protected override void OnAppearing()
+        {
+            object status = "";
+            if (App.Current.Properties.TryGetValue("login_user", out status))
+            {
+                Console.WriteLine(status);
+            }
+            else
+            {
+                passwordEntry.Text = "";
+                loginEntry.Text = "";
+                Switch.IsToggled = false;
+                webView.Source = "https://tou.edu.kz/armp/index.php?lang=rus&mod=logout";
+            }
+
+            if (App.Current.Properties.TryGetValue("switch_toogle", out status))
+            {
+                Switch.IsToggled = true;
+            }
+            else
+            {
+                Switch.IsToggled = false;
+            }
         }
     }
 }
